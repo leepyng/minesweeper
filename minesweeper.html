@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta name="format-detection" content="telephone=no">
+    <title>扫雷小游戏-Minesweeper</title>
+    <style>
+    #game_box>span {
+        display: block;
+        width: 80px;
+        height: 80px;
+        background-color: #230932;
+        border-radius: 80px;
+        line-height: 80px;
+        text-align: center;
+        color: #230932;
+        margin: 10px;
+        float: left;
+    }
+    
+
+    #game_box>div {
+        clear: both;
+        content: " ";
+        height: 0;
+    }
+    </style>
+</head>
+
+<body id="body">
+    <div class="init">
+        <div>
+            <label for="table_tags_account">表格数</label>
+            <select id="table_tags_account">
+                <option value="25">25</option>
+                <option value="81">81</option>
+            </select>
+        </div>
+        <div>
+            <label for="">炸弹数</label>
+            <input type="text" id="bombs_account" />
+        </div>
+        <button id="GameStart">开始</button>
+    </div>
+    <div id="game_box">
+    </div>
+    <script type="text/javascript">
+    function init() {
+        var game = document.getElementById('GameStart');
+        var table_tags_account, bombs_account; //初始化炸弹数和表格数参数
+        //点击开始；
+        game.onclick = function() {
+            table_tags_account = parseInt(document.getElementById('table_tags_account').value);
+
+            bombs_account = parseInt(document.getElementById('bombs_account').value);
+            if (!bombs_account || bombs_account >= table_tags_account) {
+                alert('请输入正确的炸弹数');
+                return;
+            }
+            initTable(table_tags_account, bombs_account);
+        }
+    }
+    //初始化表格
+    function initTable(tags, bombs, callback) {
+        var game_box = document.getElementById('game_box');
+        game_box.innerHTML = ''; //重新生产表格
+
+        var bomb_position = setBombs(tags, bombs); //设置炸弹
+
+        var line_account = Math.sqrt(tags); //行列数；
+        //设置好炸弹位置和表格；
+        for (var i = 0; i < tags; i++) {
+            var span = document.createElement("span");
+            (function(n) {
+                //换行
+                if (n % line_account == 0) {
+                    span.style.cssText = 'clear: both;content: "";';
+                    // var div = document.createElement("div");
+                    // game_box.appendChild(div);
+                }
+                if (bomb_position[i]) {
+                    span.innerHTML = 'x';
+
+                }
+                span.onclick = (function() {
+                    return function() {
+                        if (this.innerHTML == 'x') {
+                            this.style.color = '#fff';
+                            initTable(); //重新开始
+
+                            alert('bomb!');
+                            return;
+
+                        } else {
+                            this.style.background = '#bf96d6';
+                            // this.innerHTML = '0';
+                            // analysisBombNotice(n);
+                        }
+                    }
+                })()
+                game_box.appendChild(span);
+            })(i);
+        }
+        setBombsWarm(tags, bomb_position);
+    }
+
+
+
+    //设置雷区周围个数的提示
+    function setBombsWarm(tags, bomb_position) {
+        //获取所有的点
+        var positions = document.getElementById('game_box').getElementsByTagName('span');
+        var line_account = Math.sqrt(tags); //行列数；
+
+        for (var i = 0; i < tags; i++) {
+            (function(i) {
+                if (bomb_position[i]) {
+
+                    if (positions[i + 1] && positions[i + 1].innerHTML != 'x'&&(line_account-1!=i % line_account)) {
+                        if (parseInt(positions[i + 1].innerHTML)) {
+                            
+                                var num = positions[i + 1].innerHTML;
+                                positions[i + 1].innerHTML = ++num;
+                            
+
+                        } else {
+                            positions[i + 1].innerHTML = '1';
+                        }
+                    }
+                    if (positions[i].previousSibling && positions[i].previousSibling.innerHTML != 'x'&&(i % line_account!= 0)) {
+                        if (parseInt(positions[i].previousSibling.innerHTML)) {
+                            
+                                var num = parseInt(positions[i].previousSibling.innerHTML);
+                                positions[i].previousSibling.innerHTML = ++num;
+                            
+
+                        } else {
+                            positions[i].previousSibling.innerHTML = '1';
+                        }
+
+                    }
+
+                    if (positions[i - line_account - 1] && positions[i - line_account - 1].innerHTML != 'x'&&(i % line_account) != 0) {
+
+                        if (parseInt(positions[i - line_account - 1].innerHTML)) {
+                          
+                                var num = parseInt(positions[i - line_account - 1].innerHTML);
+                                positions[i - line_account - 1].innerHTML = ++num;
+                            
+
+                        } else {
+                            positions[i - line_account - 1].innerHTML = '1';
+                        }
+                    }
+                    if (positions[i - line_account] && positions[i - line_account].innerHTML != 'x') {
+                        if (parseInt(positions[i - line_account].innerHTML)) {
+
+                            var num = parseInt(positions[i - line_account].innerHTML);
+                            positions[i - line_account].innerHTML = ++num;
+
+
+                        } else {
+                            positions[i - line_account].innerHTML = '1';
+                        }
+                    }
+                    if (positions[i - line_account + 1] && positions[i - line_account + 1].innerHTML != 'x'&&(i % line_account) != (line_account - 1)) {
+                        if (parseInt(positions[i - line_account + 1].innerHTML)) {
+                           
+
+                                var num = parseInt(positions[i - line_account + 1].innerHTML);
+                                positions[i - line_account + 1].innerHTML = ++num;
+                            
+
+                        } else {
+                            positions[i - line_account + 1].innerHTML = '1';
+                        }
+                    }
+
+                    if (positions[i + line_account - 1] && positions[i + line_account - 1].innerHTML != 'x'&&(i % line_account) != 0) {
+
+                        if (parseInt(positions[i + line_account - 1].innerHTML)) {
+
+                            
+                                var num = parseInt(positions[i + line_account - 1].innerHTML);
+                                positions[i + line_account - 1].innerHTML = ++num;
+                            
+
+                        } else {
+                            positions[i + line_account - 1].innerHTML = '1';
+                        }
+                    }
+                    if (positions[i + line_account] && positions[i + line_account].innerHTML != 'x') {
+                        if (parseInt(positions[i + line_account].innerHTML)) {
+
+                            var num = parseInt(positions[i + line_account].innerHTML);
+                            positions[i + line_account].innerHTML = ++num;
+                        } else {
+                            positions[i + line_account].innerHTML = '1';
+                        }
+                    }
+                    if (positions[i + line_account + 1] && positions[i + line_account + 1].innerHTML != 'x'&&(i % line_account) != (line_account - 1)) {
+                        if (parseInt(positions[i + line_account + 1].innerHTML)) {
+
+                            
+                                var num = parseInt(positions[i + line_account + 1].innerHTML);
+                                positions[i + line_account + 1].innerHTML = ++num;
+                            
+
+                        } else {
+                            positions[i + line_account + 1].innerHTML = '1';
+                        }
+                    }
+                }
+            })(i)
+
+
+
+
+        }
+
+    }
+    //随机分部雷子位置
+    function setBombs(tags, bombs) {
+        var position = {};
+        for (var i = 0; i < bombs; i++) {
+
+            var x = getBombsPosition(tags);
+            if (!position[x]) {
+                position[x] = 'x';
+
+            } else {
+                bombs++;
+            }
+
+        }
+        return position;
+
+
+    }
+
+    function getBombsPosition(tags) {
+        return Math.floor(Math.random() * tags);
+    }
+    init();
+    </script>
+
+</html>
